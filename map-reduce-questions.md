@@ -91,4 +91,14 @@ The methods in this class can be called from several different processes and fro
 
 ### VA: OutputCommiter describes the commit of task output of a MapReduce job.
 
-## 11. 
+## 11. How can you set number of mappers and reducers in a MapReduce job. 
+
+### MA: By setting job.setNumMapTasks(x) and job.setNumMapTasks(y)
+
+### VA: In cmd by -D mapred.map.tasks=x -D mapred.reduce.tasks=y and in code job.setNumMapTasks(5) and job.setNumReduceTasks(2)
+
+## 12. What happends if a map task fails before sending output to the reduce task?
+
+### MA: I have no idea.
+
+### VA: Map task would be assigned to a new node and task will be run again to recreate output.
