@@ -56,4 +56,34 @@ High availability:
 
 ### MA: For blocks use hdfs fsck (path to file) -files -blocks
 
-### MV: For block status use hdfs fsck <path> -files -blocks. For filesystem status use hdfs fsck / -files -blocks -locations > dfs-fsck.log
+### VA: For block status use hdfs fsck <path> -files -blocks. For filesystem status use hdfs fsck / -files -blocks -locations > dfs-fsck.log
+
+## 9. What would happen if you store too many small files on HDFS?
+
+### MA: It would be very HDFS block memory inefficient and NameNode would be overloaded for metadata for a lot of many small files. If possible one should consider merging those files if they include for example data corresponding to the same data table.
+
+### VA: It is not reccommended as it would overload NameNode RAM because metadata is stored there, the cluster start will take longer period of time.
+
+## 10. How do you copy a file from your local fs to HDFS?
+
+### MA: hdfs dfs -put </path-in-local-fs/file> <target-path-on-hdfs>
+
+### VA: hadoop fs -copyFromLocal /tmp/data.csv /usr/temp/data.csv (-put and -copyFromLocal do exactly the same thing, with flags you can decide whether to overwrite or not existing file with that name on HDFS
+
+## 11. What do you use dfsadmin -refreshNodes and rmadmin -refreshNodes commands?
+
+### MA: dfsadmin -refreshNodes tells the NameNode to reread configuration files for DataNode configuration and for example connect new or disconnect old DataNodes without restarting all DataNodes or whole cluster. yarn rmadmin -refreshNodes [-g [timeout in seconds] -client|server] notifies NodesListManager to detect and handle include and exclude hosts changes. NodesListManager loads excluded hosts from the exclude file as specified through the yarn.resourcemanager.nodes.exclude-path configuration in yarn-site.xml. It seems rmadmin -refreshNodes is deprecated command.
+
+### VA: dfsadmin -refreshNodes run HDFS client and refresh DataNode configurations in NameNode, rmadmin -refreshNodes performs admininstrative tasks on YARN
+
+## 12. Is there a way to change replication parameter of files on HDFS that are already written on HDFS?
+
+### MA: No, you have to go directory by directory hdfs dfs -setrep -R <new-replication-factor> /<dir> . You can however do it for all new coming files by changing a property value in hdfs-site.xml < property>< name>dfs.replication< /name>< value>2< /value>< /property>
+
+### VA: We can change replication value for new content that comes in in hdfs-site.xml dfs.replication property. For existing directories or files you use hdfs dfs –setrep –w 3 /tmp/logs/file.txt
+
+## 13. Who takes care of replication consistency in hadoop cluster and what do you mean by underreplicated or overreplicated blocks?
+
+### MA: Name node takes care of replication process. Overreplication/Underreplication occurs when the number of replicas for a directory should be x and instead the number of replicas is y where x < y / x > y
+
+### VA: Name node is responsible for replication process. We can use fsck command to check for overreplicated/underreplicated blocks. The name node should automatically create missing replicas of delete redundant ones.
